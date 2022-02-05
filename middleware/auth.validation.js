@@ -1,4 +1,5 @@
 import Joi from 'joi'
+import ApiError from '../exceptions/api.error'
 
 export const authValidation = async (req, res, next) => {
   const schema = Joi.object({
@@ -8,7 +9,7 @@ export const authValidation = async (req, res, next) => {
   try {
     await schema.validateAsync(req.body)
   } catch (e) {
-    return res.status(400).json({ message: e.details[0].message})
+    return next(ApiError.BadRequest(e.details[0].message))
   }
   next()
 }
