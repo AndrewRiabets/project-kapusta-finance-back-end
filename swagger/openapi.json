@@ -1,0 +1,150 @@
+{
+  "openapi": "3.0.0",
+  "info":{
+  "title": "API team-project-kapusta-finance-back-end",
+  "description": "Description of the server",
+  "version": "1.0.0",
+  "termsOfService": "https://localhost:3001",
+  "license": {
+    "name": "MIT",
+    "url": "https://opensource.org/licenses/mit"
+    }
+  },
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "servers": [
+    {
+      "url": "https://localhost:3001/api",
+      "description": "development"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Authorization endpoints"
+    }
+  ],
+
+  "paths": {
+    "/auth/registration": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "User registration",
+        "parameters": [],
+        "security": [{"Bearer": []}],
+        "requestBody": {
+          "description": "Registration's object",
+          "required": true,
+          "content": {
+            "application/json": {
+               "schema": {
+                 "$ref": "#/components/schemas/RegistrationRequest"
+               }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationResponse"
+                }
+             }
+            }
+          },
+          "400": {
+            "description": "Bed request",
+            "content": {}
+          },
+          "409": {
+            "description": "Provided email already exists",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "User login",
+        "parameters": [],
+        "security": [{"Bearer": []}]
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "User logout",
+        "parameters": [],
+        "security": [{"Bearer": []}]
+      }
+    },
+    "/auth/refresh": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Refresh token",
+        "parameters": [],
+        "security": [{"Bearer": []}]
+      }
+    },
+    "/auth/google": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Google request"
+      }
+    }
+  },
+
+  "components": {
+    "schemas": {
+      "RegistrationRequest": {
+        "tipe": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "length": {
+              "min": "3",
+              "max": "24"
+            },
+            "example": "kujg3645HDS"
+          }
+        }
+      },
+      "RegistrationResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          },
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "User's id",
+                "example": "61ffe081b8d104fd7e02d4ec"
+              },
+              "email": {
+                "type": "string",
+                "description": "User's email",
+                "format": "email"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

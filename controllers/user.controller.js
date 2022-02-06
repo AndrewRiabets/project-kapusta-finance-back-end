@@ -1,3 +1,7 @@
+import queryString from 'query-string'
+import axios from 'axios'
+import Url from 'url'
+
 import userService from "../service/user.service"
 
 class UserController {
@@ -7,7 +11,7 @@ class UserController {
       const {email, password} = req.body
       const userData = await userService.registration(email, password)
       res.cookie('refreshToken', userData.refreshToken, {maxAge: 2592000000, httpOnly: true})
-      return res.status(200).json(userData)
+      return res.status(201).json(userData)
     } catch (e) {
      next(e)
     }
@@ -35,14 +39,6 @@ class UserController {
     }
   }
 
-  // async activate(req, res, next) {
-  //   try {
-      
-  //   } catch (e) {
-  //     next(e)
-  //   }
-  // }
-
   async refresh(req, res, next) {
     try {
       const { refreshToken } = req.cookies
@@ -58,6 +54,65 @@ class UserController {
     try {
       const users = await userService.getAllUsers()
       res.status(200).json(users)
+    } catch (e) {
+      next(e)
+    }
+  }
+
+  async googleAuth(req, res, next) {
+    try {
+      const strParams = queryString.stringify({
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        redirect_uri: `${process.env.BASE_URL}/api/auth/google-redirect`,
+        scope: [
+          "https://www.googleapis.com/auth/userinfo/email",
+          "https://www.googleapis.com/auth/userinfo/profile",
+        ].join(" "),
+      
+        response_type: 'code',
+        access_type: 'offline',
+        prompt: 'consent',
+      })
+      
+      return res.redirect(
+        `https://accounts.google.com/o/oauth2/v2/auth?${strParams}`
+      )
+    } catch (e) {
+      next(e)
+    }
+  }
+
+  async googleRedirect(req, res, next) {
+    try {
+      const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`
+      const urlObj = new Url(fullUrl)
+      const urlParams = queryString.parse(urlObj.search)
+      const code = urlParams.code
+      const tokenData = await axios({
+        url: 'https://oauth2.googleapis.com/token',
+        method: 'post',
+        data: {
+          client_id: process.env.GOOGLE_CLIENT_ID,
+          client_secret: process.env.GOOGLE_CLIENT_SECRET,
+          redirect_uri: `localhost:3000/api/google-redirect`,
+          grant_type: 'authorization_code',
+          code,
+        },
+      })
+
+      const userData = await axios({
+        url: 'https://accounts.google.com/o/oauth2/v2/userinfo',
+        method: 'get',
+        headers: {
+          Authorization: `Bearer ${tokenData.data.access_token}`
+        }
+      })
+
+      console.log(userData);
+
+      return res.redirect(
+        `${process.env.FRONTEND_URL}?email=${userData.data.email}`
+      )
     } catch (e) {
       next(e)
     }

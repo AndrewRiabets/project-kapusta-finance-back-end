@@ -13,6 +13,12 @@ router.post('/logout', guard, userController.logout)
 
 router.get('/refresh', userController.refresh)
 
-router.get('/users', guard, userController.getUsers)
+router.get('/users', userController.getUsers)
+
+router.get('/google', userController.googleAuth)
+
+router.get('/google-redirect', userController.googleRedirect)
+
+
 
 export default router
