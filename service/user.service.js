@@ -8,7 +8,7 @@ class UserService {
   async registration(email, password) {
     const candidate = await UserModel.findOne({ email })
     if (candidate) {
-      throw ApiError.BadRequest(`Пользователь с адрессом ${email} уже существует`)
+      throw ApiError.Conflict(`Пользователь с адрессом ${email} уже существует`)
     }
     const hashPassword = await bcrypt.hash(password, 5)
     const user = await UserModel.create({email, password: hashPassword})
