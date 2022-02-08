@@ -1,6 +1,6 @@
 import express from 'express'
 import userController from '../controllers/user.controller'
-import {authValidation} from '../middleware/auth.validation'
+import {authValidation} from '../middleware/user.validation'
 import guard from '../middleware/guard'
 
 const router = express.Router()
@@ -13,7 +13,7 @@ router.post('/logout', guard, userController.logout)
 
 router.get('/refresh', userController.refresh)
 
-router.get('/users', userController.getUsers)
+router.get('/users', guard, userController.getUsers)
 
 router.get('/google', userController.googleAuth)
 

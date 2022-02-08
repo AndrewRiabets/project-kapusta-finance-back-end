@@ -59,6 +59,22 @@ class UserController {
     }
   }
 
+  async resetBalance(req, res, next) {
+    try {
+      const { balance } = req.body
+      const userId = req.user.id
+      const user = await userService.setBalance(userId, balance)
+      const response = {
+        userId: user._id,
+        email: user.email,
+        balance: user.balance,
+      }
+      res.status(200).json(response)
+    } catch (e) {
+      next(e)
+    }
+  }
+
   async googleAuth(req, res, next) {
     try {
       const strParams = queryString.stringify({

@@ -59,6 +59,11 @@ class UserService {
     return users
   }
 
+  async setBalance(userId, balance) {
+    const user = await UserModel.findOneAndUpdate({ _id: userId }, {balance}, { new: true })
+    return user
+  }
+
   async saveNewToken(user) {
     const payload = {id: user._id, email: user.email}
     const tokens = tokenService.generateTokens(payload)

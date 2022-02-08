@@ -17,4 +17,7 @@ export default class ApiError extends Error {
   static Conflict(message = 'Конфликт', errors = []) {
     return new ApiError(409, message, errors)
   }
+  static NotImplemented(message = 'Hе реализовано', errors = []) {
+    return new ApiError(501, message, errors)
+  }
 }
