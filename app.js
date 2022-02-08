@@ -6,12 +6,10 @@ import swaggerUi  from 'swagger-ui-express'
 import errorMiddleware from './middleware/error.middleware'
 import * as swaggerDocument from './swagger/openapi.json'
 import authRouter from './routers/auth.route'
+import bankingRouter from './routers/banking.route'
 import pkg from './swagger/openapi.json'
-// import usersRouter from './routes/api/usersRoute'
-// import contactsRouter from './routes/api/contactsRoute'
-// import { HttpCode, Messages } from './lib/constants'
-// import guard from './middleware/guard'
-// import resError from './lib/responseError'
+import guard from './middleware/guard'
+
 
 const app = express()
 
@@ -20,7 +18,7 @@ app.use(express.json())
 app.use(cookieParser())
 
 app.use('/api/auth', authRouter)
-// app.use('/api/users', guard, usersRouter)
+app.use('/api/banking', guard, bankingRouter)
 // app.use('/api/contacts', guard, contactsRouter)
 // app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument.default))
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(pkg))

@@ -6,22 +6,32 @@ const transactionSchema = new Schema({
   userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
+    required: true,
   },
   categoryId: {
     type: Schema.Types.ObjectId,
     ref: 'Category',
+    required: true,
   },
-  refreshToken: {
+  dateTransaction: {
+    type: Date,
+    default: Date.now,
+  },
+  description: {
     type: String,
+    required: true,
+  },
+  amount: {
+    type: Number,
     required: true,
   },
   isProfit: {
     type: Boolean,
-    default: false,
+    required: true,
   },
 
   
-},{ versionKey: false })
+},{ versionKey: false, timestamps: true,})
 
 const Transaction = model('Transaction', transactionSchema)
 export default Transaction

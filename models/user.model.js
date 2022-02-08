@@ -14,7 +14,10 @@ const userSchema = new Schema({
   name: {
     type: String,
   },
-  
+  balance: {
+    type: Number,
+    default: 0,
+  },
 },{ versionKey: false })
 
 const User = model('User', userSchema)

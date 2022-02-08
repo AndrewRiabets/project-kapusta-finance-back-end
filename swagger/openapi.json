@@ -4,7 +4,6 @@
   "title": "API team-project-kapusta-finance-back-end",
   "description": "Description of the server",
   "version": "1.0.0",
-  "termsOfService": "https://localhost:3001",
   "license": {
     "name": "MIT",
     "url": "https://opensource.org/licenses/mit"
@@ -14,7 +13,7 @@
   "produces": ["application/json"],
   "servers": [
     {
-      "url": "https://localhost:3001/api",
+      "url": "http://localhost:3001/api",
       "description": "development"
     }
   ],
@@ -22,6 +21,10 @@
     {
       "name": "Auth",
       "description": "Authorization endpoints"
+    },
+    {
+      "name": "Banking",
+      "description": "Job for finance endpoints"
     }
   ],
 
@@ -29,9 +32,8 @@
     "/auth/registration": {
       "post": {
         "tags": ["Auth"],
-        "summary": "User registration",
+        "summary": "Регистрация пользователя",
         "parameters": [],
-        "security": [{"Bearer": []}],
         "requestBody": {
           "description": "Registration's object",
           "required": true,
@@ -68,15 +70,14 @@
     "/auth/login": {
       "post": {
         "tags": ["Auth"],
-        "summary": "User login",
-        "parameters": [],
-        "security": [{"Bearer": []}]
+        "summary": "Вход пользователя (login)",
+        "parameters": []
       }
     },
     "/auth/logout": {
       "post": {
         "tags": ["Auth"],
-        "summary": "User logout",
+        "summary": "Выход пользователя (logout)",
         "parameters": [],
         "security": [{"Bearer": []}]
       }
@@ -84,7 +85,13 @@
     "/auth/refresh": {
       "get": {
         "tags": ["Auth"],
-        "summary": "Refresh token",
+        "summary": "Получение нового токена при окончании срока действия текущего"
+      }
+    },
+    "/auth/users": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Возвращает всех пользователей (для тестирования)",
         "parameters": [],
         "security": [{"Bearer": []}]
       }
@@ -92,7 +99,43 @@
     "/auth/google": {
       "get": {
         "tags": ["Auth"],
-        "summary": "Google request"
+        "summary": "Редирект запроса на Google для логинизации"
+      }
+    },
+
+    "/banking/reset-balance": {
+      "patch": {
+        "tags": ["Banking"],
+        "summary": "Устанавливает значение баланса",
+        "parameters": [],
+        "security": [{"Bearer": []}],
+        "requestBody": {
+          "description": "balance object",
+          "required": true,
+          "content": {
+            "application/json": {
+               "schema": {
+                "$ref": "#/components/schemas/ResetBalanceRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResetBalanceResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bed request",
+            "content": {}
+          }
+        }  
       }
     }
   },
@@ -100,7 +143,7 @@
   "components": {
     "schemas": {
       "RegistrationRequest": {
-        "tipe": "object",
+        "type": "object",
         "required": ["email", "password"],
         "properties": {
           "email": {
@@ -144,6 +187,45 @@
             }
           }
         }
+      },
+      "ResetBalanceRequest": {
+        "type": "object",
+        "required": ["balance"],
+        "properties": {
+          "balance": {
+            "type": "number",
+            "description": "Новая сумма баланса",
+            "example": 2340.65
+          }
+        }
+      },
+      "ResetBalanceResponse": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "description": "User's id",
+            "example": "61ffe081b8d104fd7e02d4ec"
+          },
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "balance": {
+            "type": "number",
+            "description": "Новая сумма баланса",
+            "example": 2340.65
+          }
+        }
+      }
+    },
+
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     }
   }

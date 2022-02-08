@@ -13,3 +13,16 @@ export const authValidation = async (req, res, next) => {
   }
   next()
 }
+
+export const setFinanceValidation = async (req, res, next) => {
+  const schema = Joi.object({
+    startUpFinance: Joi.number().required(),
+    dateStartUp: Joi.date().required(),
+  })
+  try {
+    await schema.validateAsync(req.body)
+  } catch (e) {
+    return next(ApiError.BadRequest(e.details[0].message))
+  }
+  next()
+}
