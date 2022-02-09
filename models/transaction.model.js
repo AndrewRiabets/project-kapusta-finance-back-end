@@ -13,6 +13,10 @@ const transactionSchema = new Schema({
     ref: 'Category',
     required: true,
   },
+  categoryName:{
+    type: String,
+    required: true,
+  },
   dateTransaction: {
     type: Date,
     default: Date.now,

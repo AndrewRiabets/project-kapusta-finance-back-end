@@ -14,10 +14,9 @@ export const authValidation = async (req, res, next) => {
   next()
 }
 
-export const setFinanceValidation = async (req, res, next) => {
+export const resetBalanceValidation = async (req, res, next) => {
   const schema = Joi.object({
-    startUpFinance: Joi.number().required(),
-    dateStartUp: Joi.date().required(),
+    balance: Joi.number().min(-10000000).max(10000000).required(),
   })
   try {
     await schema.validateAsync(req.body)
