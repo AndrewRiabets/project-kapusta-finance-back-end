@@ -137,7 +137,155 @@
           }
         }  
       }
+    },
+    "/banking/add-transaction": {
+      "post": {
+        "tags": ["Banking"],
+        "summary": "Добавляет новую транзакцию",
+        "parameters": [],
+        "security": [{"Bearer": []}],
+        "requestBody": {
+          "description": "transaction object",
+          "required": true,
+          "content": {
+            "application/json": {
+               "schema": {
+                "$ref": "#/components/schemas/AddTransactionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bed request",
+            "content": {}
+          }
+        }  
+      }
+    },
+    "/banking/get-category": {
+      "get": {
+        "tags": ["Banking"],
+        "summary": "Возвращает список категорий",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "isProfit",
+            "required": "true",
+            "type": "boolean",
+            "description": "Тип категории (Доход - true, Расход - false)"
+          }
+        ],
+        "security": [{"Bearer": []}],
+        "responses": {
+          "200": {
+            "description": "Ok operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bed request",
+            "content": {}
+          }
+        }
+      }  
+    },
+    "/banking/get-expense": {
+      "get": {
+        "tags": ["Banking"],
+        "summary": "Возвращает список транзакций расходов",
+        "security": [{"Bearer": []}],
+        "responses": {
+          "200": {
+            "description": "Ok operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bed request",
+            "content": {}
+          }
+        }
+      }  
+    },
+    "/banking/get-income": {
+      "get": {
+        "tags": ["Banking"],
+        "summary": "Возвращает список транзакций доходов",
+        "security": [{"Bearer": []}],
+        "responses": {
+          "200": {
+            "description": "Ok operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bed request",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/banking/remove-transaction": {
+      "delete": {
+        "tags": ["Banking"],
+        "summary": "Удаляет транзакцию и возвращает список транзакций",
+        "security": [{"Bearer": []}],
+        "requestBody": {
+          "description": "transaction object",
+          "required": true,
+          "content": {
+            "application/json": {
+               "schema": {
+                "$ref": "#/components/schemas/DeleteTransactionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bed request",
+            "content": {}
+          }
+        }
+      }
     }
+
   },
 
   "components": {
@@ -162,6 +310,7 @@
           }
         }
       },
+            
       "RegistrationResponse": {
         "type": "object",
         "properties": {
@@ -199,6 +348,7 @@
           }
         }
       },
+      
       "ResetBalanceResponse": {
         "type": "object",
         "properties": {
@@ -216,6 +366,133 @@
             "type": "number",
             "description": "Новая сумма баланса",
             "example": 2340.65
+          }
+        }
+      },
+
+      "AddTransactionRequest": {
+        "type": "object",
+        "required": ["categoryId"],
+        "properties": {
+          "categoryId": {
+            "type": "string",
+            "description": "Id категории",
+            "example": "6201097323254cceb91811ee"
+          },
+          "categoryName": {
+            "type": "string",
+            "description": "Наименование категории",
+            "example": "Продукты"
+          },
+          "dateTransaction": {
+            "type": "date",
+            "description": "Дата транзакции",
+            "example": "2022-10-02T21:00:00.000Z"
+          },
+          "description": {
+            "type": "string",
+            "description": "Наименование продукта или статьи транзакции",
+            "example": "Сало"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Сумма транзакции",
+            "example": 234.65
+          },
+          "isProfit": {
+            "type": "boolean",
+            "description": "Тип транзакции (Доход - true, Расход - false)",
+            "example": "false"
+          }
+        }
+      },
+      "TransactionsResponse": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number",
+            "description": "Баланс",
+            "example": 20366.50
+          },
+          "data": {
+            "type": "Массив объектов (транзакций)",
+            "array": [
+              {
+                "_id": {
+                  "type": "string",
+                  "description": "Id транзакции",
+                  "example": "6202a6cad8863ac0a2e866b9"
+                },
+                "userId": {
+                  "type": "string",
+                  "description": "Id пользователя",
+                  "example": "62016bcf8255e9a191ea95dd"
+                },
+                "categoryId": {
+                  "type": "string",
+                  "description": "Id категории",
+                  "example": "6201097323254cceb91811ee"
+                },
+                "categoryName": {
+                  "type": "string",
+                  "description": "Наименование категории",
+                  "example": "Продукты"
+                },
+                "dateTransaction": {
+                  "type": "date",
+                  "description": "Дата транзакции",
+                  "example": "2022-10-02T21:00:00.000Z"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Наименование продукта или статьи транзакции",
+                  "example": "Сало"
+                },
+                "amount": {
+                  "type": "number",
+                  "description": "Сумма транзакции",
+                  "example": 234.65
+                },
+                "isProfit": {
+                  "type": "boolean",
+                  "description": "Тип транзакции (Доход - true, Расход - false)",
+                  "example": "false"
+                }
+              }
+            ]
+            
+          }
+        }
+      },
+      
+      "DeleteTransactionRequest": {
+        "type": "object",
+        "required": ["transactionId"],
+        "properties": {
+          "transactionId": {
+            "type": "string",
+            "description": "Id транзакции",
+            "example": "61ffe081b8d104fd7e02d4ec"
+          }
+        }
+      },
+      "CategoryResponse": {
+        "type": "object",
+        "properties": {
+         "_id": {
+            "type": "string",
+            "description": "ID категории",
+            "example": "6201097323254cceb91811ee"
+         },
+          "categoryName": {
+            "type": "string",
+           "description": "Наименование категории",
+           "example": "Продукты"
+          },
+          "isProfit": {
+            "type": "boolean",
+            "description": "Тип категории (Доход - true, Расход - false)",
+            "example": false 
           }
         }
       }
