@@ -1,38 +1,30 @@
  import transactionService from '../service/transaction.service'
- import categoryService from '../service/catagory.service'
+ import categoryService from '../service/category.service'
  
   class BankingController {
 
     async insert(req, res) {
-      const data = await transactionService.addTransaction(req.user.id, req.body)
-      res.json(data)
-    }
-
-    async getExpense(req, res) {
-      const data = await transactionService.getAll(req.user.id, false)
-      res.json(data)
-    }
-
-    async getIncome(req, res) {
-      const data = await transactionService.getAll(req.user.id, true)
+      const reception = req.query.reception
+      const data = await transactionService.addTransaction(req.user.id, req.body, reception)
       res.json(data)
     }
 
     async remove(req, res) {
-      const data = await transactionService.remove(req.body.transactionId, req.user.id)
+      const id = req.params.id;
+      const reception = req.query.reception
+      const data = await transactionService.remove(id, req.user.id, reception)
       res.json(data)
     }
 
-    async update(req, res) {
-      const data = await transactionService.remove(req.body.transactionId, req.user.id)
+
+    async getTransactions(req, res) {
+      const reception = req.query.reception
+      const data = await transactionService.getAll(req.user.id, reception)
       res.json(data)
     }
-
-    async update(req, res) {
-      
-    }
+    
     async getCategory(req, res) {
-      const data = await categoryService.getCategory(req.query.isProfit)
+      const data = await categoryService.getCategory(req.query)
       res.json(data)
     }
   }

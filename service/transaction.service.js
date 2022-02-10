@@ -6,7 +6,7 @@ import mongoose from 'mongoose'
 
 class TransactionService {
 
-  async addTransaction(userId, body) {
+  async addTransaction(userId, body, reception) {
     const transaction = await TransactionModel.create({userId, ...body})
     if (!transaction) {
       throw ApiError.NotImplemented('Ошибка добавления транзакции')
@@ -21,10 +21,10 @@ class TransactionService {
       user.balance = balance.toFixed(2)
     }
     await user.save()
-    return await this.getAll(userId, isProfit)
+    return await this.getAll(userId, reception, isProfit)
   }
 
-  async remove(transactionId, userId) {
+  async remove(transactionId, userId, reception) {
     const transaction = await TransactionModel.findOneAndRemove({ _id: transactionId })
     if (!transaction) {
       throw ApiError.NotImplemented('Ошибка удаления транзакции')
@@ -39,33 +39,31 @@ class TransactionService {
       user.balance = balance.toFixed(2)
     }
     await user.save()
-    return await this.getAll(userId, isProfit)
+    return await this.getAll(userId, reception, isProfit)
   }
 
-  async getAll(userId, isProfit) {
-  const data = await TransactionModel.find({userId, isProfit}).sort({createdAt: -1 })
-  const user = await UserModel.findById(userId)
-  return { total: user.balance, data}
-      // .distinct("description")
-    
-    // const transactions = await TransactionModel.find({userId}).count({$sum: "amount"})
-    //, {date: { $gte: start, $lt: end } } //, "isProfit": true
-  }
 
-  async recalculateAmount(userId) {
-    const result = await TransactionModel.aggregate([
-      {$match: {"userId": new mongoose.Types.ObjectId(userId)}},
-      {$group : {
-          _id: "$isProfit",
-          totalAmount: { $sum: "$amount"},
-          count: { $sum: 1 }, 
-        
-       }
-      }
-    ])
-    const profit = result.find(item => item._id === true).totalAmount
-    const costs = result.find(item => item._id === false).totalAmount
-    return profit - costs
+
+  async getAll(userId, reception = null, isProfit) {
+    if(isProfit === undefined && !reception) {
+      throw ApiError.BadRequest('Отсутслвует обязателный параметр')
+    }
+    let data
+    switch (reception) {
+     case 'all':
+        data = await TransactionModel.find({userId}).sort({createdAt: -1 })
+        break
+     case 'profit':
+        data = await TransactionModel.find({userId, isProfit: true}).sort({createdAt: -1 })  
+        break
+     case 'costs':
+        data = await TransactionModel.find({userId, isProfit: false}).sort({createdAt: -1 })
+        break
+      default:
+        data = await TransactionModel.find({userId, isProfit}).sort({createdAt: -1 })
+    }
+    const user = await UserModel.findById(userId)
+    return { total: user.balance, data}
   }
 }
 

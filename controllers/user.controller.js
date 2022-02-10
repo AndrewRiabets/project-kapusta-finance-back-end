@@ -6,78 +6,53 @@ import userService from "../service/user.service"
 
 class UserController {
 
-  async registration(req, res, next) {
-    try {
+  async registration(req, res) {
       const {email, password} = req.body
       const userData = await userService.registration(email, password)
       res.cookie('refreshToken', userData.refreshToken, {maxAge: 2592000000, httpOnly: true})
       return res.status(201).json(userData)
-    } catch (e) {
-     next(e)
-    }
   }
 
-  async login(req, res, next) {
-    try {
+  async login(req, res) {
       const {email, password} = req.body
       const userData = await userService.login(email, password)
       res.cookie('refreshToken', userData.refreshToken, {maxAge: 2592000000, httpOnly: true})
       return res.status(200).json(userData)
-    } catch (e) {
-      next(e)
-    }
   }
 
-  async logout(req, res, next) {
-    try {
+  async logout(req, res) {
       const { refreshToken } = req.cookies
       const token = await userService.logout(refreshToken)
       res.clearCookie('refreshToken')
       return res.status(200).json(token)
-    } catch (e) {
-      next(e)
-    }
   }
 
-  async refresh(req, res, next) {
-    try {
+  async refresh(req, res) {
       const { refreshToken } = req.cookies
       const userData = await userService.refresh(refreshToken)
       res.cookie('refreshToken', userData.refreshToken, {maxAge: 2592000000, httpOnly: true})
       return res.status(200).json(userData)
-    } catch (e) {
-      next(e)
-    }
   }
 
-  async getUsers(req, res, next) {
-    try {
+  async getUsers(req, res) {
       const users = await userService.getAllUsers()
       res.status(200).json(users)
-    } catch (e) {
-      next(e)
-    }
   }
 
-  async resetBalance(req, res, next) {
-    try {
-      const { balance } = req.body
-      const userId = req.user.id
-      const user = await userService.setBalance(userId, balance)
-      const response = {
-        userId: user._id,
-        email: user.email,
-        balance: user.balance,
-      }
-      res.status(200).json(response)
-    } catch (e) {
-      next(e)
+  async resetBalance(req, res) {
+    const { balance } = req.body
+    const userId = req.user.id
+    const user = await userService.setBalance(userId, balance)
+    const response = {
+      userId: user._id,
+      email: user.email,
+      balance: user.balance,
     }
+    res.status(200).json(response)
   }
 
-  async googleAuth(req, res, next) {
-    try {
-      const strParams = queryString.stringify({
+  async googleAuth(req, res) {
+        const strParams = queryString.stringify({
         client_id: process.env.GOOGLE_CLIENT_ID,
         redirect_uri: `${process.env.BASE_URL}/api/auth/google-redirect`,
         scope: [
@@ -93,13 +68,9 @@ class UserController {
       return res.redirect(
         `https://accounts.google.com/o/oauth2/v2/auth?${strParams}`
       )
-    } catch (e) {
-      next(e)
-    }
   }
 
-  async googleRedirect(req, res, next) {
-    try {
+  async googleRedirect(req, res) {
       const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`
       const urlObj = new Url(fullUrl)
       const urlParams = queryString.parse(urlObj.search)
@@ -129,9 +100,6 @@ class UserController {
       return res.redirect(
         `${process.env.FRONTEND_URL}?email=${userData.data.email}`
       )
-    } catch (e) {
-      next(e)
-    }
   }
 }
 
