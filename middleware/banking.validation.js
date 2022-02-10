@@ -17,3 +17,15 @@ export const insertValidation = async (req, res, next) => {
   }
   next()
 }
+
+export const idValidation = async (req, res, next) => {
+  const schema = Joi.object({
+    id: Joi.string().length(24).pattern(/^[0-9a-f]*$/)
+  });
+  try {
+    await schema.validateAsync(req.params)
+  } catch (e) {
+    return next(ApiError.BadRequest(e.details[0].message))
+  }
+  next()
+}

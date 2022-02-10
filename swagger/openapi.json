@@ -88,14 +88,6 @@
         "summary": "Получение нового токена при окончании срока действия текущего"
       }
     },
-    "/auth/users": {
-      "get": {
-        "tags": ["Auth"],
-        "summary": "Возвращает всех пользователей (для тестирования)",
-        "parameters": [],
-        "security": [{"Bearer": []}]
-      }
-    },
     "/auth/google": {
       "get": {
         "tags": ["Auth"],
@@ -138,11 +130,19 @@
         }  
       }
     },
+
     "/banking/add-transaction": {
       "post": {
         "tags": ["Banking"],
         "summary": "Добавляет новую транзакцию",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "reception",
+            "type": "string",
+            "description": "Тип возвращаемых данных('profit'-доходы, 'costs'-расходы, 'all'-все)"
+          }
+        ],
         "security": [{"Bearer": []}],
         "requestBody": {
           "description": "transaction object",
@@ -173,6 +173,7 @@
         }  
       }
     },
+    
     "/banking/get-category": {
       "get": {
         "tags": ["Banking"],
@@ -181,9 +182,8 @@
           {
             "in": "query",
             "name": "isProfit",
-            "required": "true",
             "type": "boolean",
-            "description": "Тип категории (Доход - true, Расход - false)"
+            "description": "Тип категории (Доход - true, Расход - false, Все - без параметра)"
           }
         ],
         "security": [{"Bearer": []}],
@@ -205,10 +205,19 @@
         }
       }  
     },
-    "/banking/get-expense": {
+    "/banking/get-transactions": {
       "get": {
         "tags": ["Banking"],
-        "summary": "Возвращает список транзакций расходов",
+        "summary": "Возвращает список транзакций и баланс",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "reception",
+            "required": "true",
+            "type": "string",
+            "description": "Тип возвращаемых данных('profit'-доходы, 'costs'-расходы, 'all'-все)"
+          }
+        ],
         "security": [{"Bearer": []}],
         "responses": {
           "200": {
@@ -225,48 +234,30 @@
             "description": "Bed request",
             "content": {}
           }
-        }
-      }  
-    },
-    "/banking/get-income": {
-      "get": {
-        "tags": ["Banking"],
-        "summary": "Возвращает список транзакций доходов",
-        "security": [{"Bearer": []}],
-        "responses": {
-          "200": {
-            "description": "Ok operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TransactionsResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bed request",
-            "content": {}
-          }
-        }
+        }  
       }
     },
-    "/banking/remove-transaction": {
+
+    "/banking/remove-transaction/:id": {
       "delete": {
         "tags": ["Banking"],
         "summary": "Удаляет транзакцию и возвращает список транзакций",
         "security": [{"Bearer": []}],
-        "requestBody": {
-          "description": "transaction object",
-          "required": true,
-          "content": {
-            "application/json": {
-               "schema": {
-                "$ref": "#/components/schemas/DeleteTransactionRequest"
-              }
-            }
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": "true",
+            "type": "string",
+            "description": "ID удаляемой транзакции"
+          },
+          {
+            "in": "query",
+            "name": "reception",
+            "type": "string",
+            "description": "Тип возвращаемых данных('profit'-доходы, 'costs'-расходы, 'all'-все)"
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "Ok operation",
@@ -465,17 +456,6 @@
         }
       },
       
-      "DeleteTransactionRequest": {
-        "type": "object",
-        "required": ["transactionId"],
-        "properties": {
-          "transactionId": {
-            "type": "string",
-            "description": "Id транзакции",
-            "example": "61ffe081b8d104fd7e02d4ec"
-          }
-        }
-      },
       "CategoryResponse": {
         "type": "object",
         "properties": {
