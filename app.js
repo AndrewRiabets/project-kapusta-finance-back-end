@@ -7,9 +7,8 @@ import errorMiddleware from './middleware/error.middleware'
 import authRouter from './routers/auth.route'
 import bankingRouter from './routers/banking.route'
 import statisticRouter from './routers/statistic.route'
-import pkg from './swagger/openapi.json'
-import guard from './middleware/guard'
-
+import pkg from './json/openapi.json'
+import guard from './middleware/guard.middleware'
 
 const app = express()
 

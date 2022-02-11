@@ -2,7 +2,7 @@ import express from 'express'
 import tryCatchWrapper from '../helpers/try.wrapper'
 import userController from '../controllers/user.controller'
 import {authValidation} from '../middleware/user.validation'
-import guard from '../middleware/guard'
+import guard from '../middleware/guard.middleware'
 
 const router = express.Router()
 

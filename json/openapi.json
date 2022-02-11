@@ -25,6 +25,10 @@
     {
       "name": "Banking",
       "description": "Job for finance endpoints"
+    },
+    {
+      "name": "Statistic",
+      "description": "Statistical functional"
     }
   ],
 
@@ -275,6 +279,44 @@
           }
         }
       }
+    },
+
+    "/statistic/summary": {
+      "get": {
+        "tags": ["Statistic"],
+        "summary": "Возвращает объект - сводку по месяцам",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "countMonths",
+            "type": "number",
+            "description": "Устанавливается количество месяцев сводки"
+          }
+        ],
+        "security": [{"Bearer": []}],
+        "responses": {
+          "200": {
+            "description": "Ok operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SummaryResponse"
+                }
+              }
+            }
+          }
+        } 
+      } 
+    },
+    "/statistic/category-grouping": {
+      "get": {
+        "tags": ["Statistic"]
+      }
+    },
+    "/statistic/items-grouping/:categoryId": {
+      "get": {
+        "tags": ["Statistic"] 
+      }
     }
 
   },
@@ -475,6 +517,25 @@
             "example": false 
           }
         }
+      },
+      "SummaryResponse": {
+        "type": "Массив объектов",
+        "example": [
+          {
+            "id": 3,
+            "description": "ДЕКАБРЬ 2021",
+            "profit": {
+              "_id": true,
+              "totalAmount": 333,
+              "count": 1
+            },
+            "costs": {
+              "_id": false,
+              "totalAmount": 1873,
+              "count": 3
+            }
+          }
+        ]
       }
     },
 
