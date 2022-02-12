@@ -25,7 +25,7 @@ class TransactionService {
   }
 
   async remove(transactionId, userId, reception) {
-    const transaction = await TransactionModel.findOneAndRemove({ _id: transactionId })
+    const transaction = await TransactionModel.findOneAndRemove({ _id: transactionId, userId})
     if (!transaction) {
       throw ApiError.NotImplemented('Ошибка удаления транзакции')
     }

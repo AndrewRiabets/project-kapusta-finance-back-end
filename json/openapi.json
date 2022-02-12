@@ -308,9 +308,16 @@
         } 
       } 
     },
-    "/statistic/category-grouping": {
+    "/statistic/category-grouping/profit/:date": {
       "get": {
-        "tags": ["Statistic"]
+        "tags": ["Statistic"],
+        "summary": "Возвращает объект - сводку доходов за месяц сгруппированую по категориям"
+      }
+    },
+    "/statistic/category-grouping/costs/:date": {
+      "get": {
+        "tags": ["Statistic"],
+        "summary": "Возвращает объект - сводку расходов за месяц сгруппированую по категориям"
       }
     },
     "/statistic/items-grouping/:categoryId": {
