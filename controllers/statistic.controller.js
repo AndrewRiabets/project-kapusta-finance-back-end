@@ -1,7 +1,7 @@
 import statisticService from '../service/statistic.service'
 
 class StatisticController {
-  async summary(req, res, next) {
+  async summary(req, res) {
     const userId = req.user.id
     let countMonths = 6
     if (req.query.countMonths !== undefined) {
@@ -9,6 +9,20 @@ class StatisticController {
     }
     const data = await statisticService.summary(userId, countMonths)
       res.json(data)
+  }
+
+  async groupCostsByCategory(req, res) {
+    const { date } = req.params
+    const userId = req.user.id
+    const data = await statisticService.categoryGrouping(userId, date, false)
+    res.json(data)
+  }
+
+  async groupProfitByCategory(req, res) {
+    const { date } = req.params
+    const userId = req.user.id
+    const data = await statisticService.categoryGrouping(userId, date, true)
+    res.json(data)
   }
 }
 

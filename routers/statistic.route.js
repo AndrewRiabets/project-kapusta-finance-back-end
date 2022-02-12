@@ -7,7 +7,9 @@ const router = express.Router()
 
 router.get('/summary', summaryValidation, tryCatchWrapper(statisticController.summary))
 
-router.get('/category-grouping', tryCatchWrapper(statisticController))
+router.get('/category-grouping/profit/:date', tryCatchWrapper(statisticController.groupProfitByCategory))
+
+router.get('/category-grouping/costs/:date',tryCatchWrapper(statisticController.groupCostsByCategory))
 
 router.get('/items-grouping/:categoryId', tryCatchWrapper(statisticController))
 

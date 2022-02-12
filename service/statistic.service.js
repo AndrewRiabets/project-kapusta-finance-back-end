@@ -9,6 +9,7 @@ class StatisticService {
 
   async summary(userId, countMonths) {
     const data = []
+    
     for (let i = countMonths; i > 0; i -= 1) {
       const date = new Date()
       date.setMonth(date.getMonth() - i + 1)
@@ -22,11 +23,10 @@ class StatisticService {
       endDate.setMonth(date.getMonth() + 1)
       endDate.setDate(0)
       endDate.setHours(3, 0, 0)
-   
       const result = await TransactionModel.aggregate([
         {$match: {
           "userId": new mongoose.Types.ObjectId(userId),
-          "dateTransaction": { $gte: startDate, $lt: endDate}
+          "dateTransaction": { $gte: startDate, $lte: endDate}
         }},
         {$group : {
           _id: "$isProfit",
@@ -38,6 +38,8 @@ class StatisticService {
         
       const obj  = {
         id: i,
+        startDate: startDate.toISOString().split('T')[0],
+        endDate: endDate.toISOString().split('T')[0],
         description: monthName.ru[monthNumber] + ' ' + startDate.getFullYear(),
         profit: {...result.find(item => item._id)},
         costs: {...result.find(item => !item._id)},
@@ -48,13 +50,29 @@ class StatisticService {
     return data
   }
 
-  async test(userId) {
-      // .distinct("description")
+  async categoryGrouping(userId, strDate, isProfit) {
+    const date = new Date(strDate)
+    const startDate = new Date(strDate)
+    const endDate = new Date(strDate)
+    startDate.setDate(1)
+    endDate.setMonth(date.getMonth() + 1)
+    endDate.setDate(0)
     
-    // const transactions = await TransactionModel.find({userId}).count({$sum: "amount"})
-    //, {date: { $gte: start, $lt: end } } //, "isProfit": true
+    const result = await TransactionModel.aggregate([
+      {$match: {
+        "userId": new mongoose.Types.ObjectId(userId),
+        isProfit,
+        "dateTransaction": { $gte: startDate, $lt: endDate}
+      }},
+      {$group : {
+        _id: {categoryId: "$categoryId",categoryName: "$categoryName"},
+        totalAmount: { $sum: "$amount"},
+        count: { $sum: 1 }, 
+        }
+      }
+    ])
 
-
+    return result
   }
 
   async recalculateAmount(userId) {
