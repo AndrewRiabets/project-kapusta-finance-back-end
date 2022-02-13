@@ -35,7 +35,6 @@ class StatisticService {
           }
         }
       ])
-        
       const obj  = {
         id: i,
         startDate: startDate.toISOString().split('T')[0],
@@ -51,13 +50,7 @@ class StatisticService {
   }
 
   async categoryGrouping(userId, strDate, isProfit) {
-    const date = new Date(strDate)
-    const startDate = new Date(strDate)
-    const endDate = new Date(strDate)
-    startDate.setDate(1)
-    endDate.setMonth(date.getMonth() + 1)
-    endDate.setDate(0)
-    
+    const { startDate, endDate } = this.rangeDate(strDate)
     const result = await TransactionModel.aggregate([
       {$match: {
         "userId": new mongoose.Types.ObjectId(userId),
@@ -65,7 +58,11 @@ class StatisticService {
         "dateTransaction": { $gte: startDate, $lt: endDate}
       }},
       {$group : {
-        _id: {categoryId: "$categoryId",categoryName: "$categoryName"},
+        _id: {
+          categoryId: "$categoryId",
+          categoryName: "$categoryName",
+          startDate: startDate,
+        },
         totalAmount: { $sum: "$amount"},
         count: { $sum: 1 }, 
         }
@@ -75,21 +72,37 @@ class StatisticService {
     return result
   }
 
-  async recalculateAmount(userId) {
+  async itemsGrouping(userId, categoryId, date) {
+    
+    const { startDate, endDate } = this.rangeDate(date)
     const result = await TransactionModel.aggregate([
-      {$match: {"userId": new mongoose.Types.ObjectId(userId)}},
-      {$group : {
-          _id: "$isProfit",
-          totalAmount: { $sum: "$amount"},
-          count: { $sum: 1 }, 
+      {$match: {
+        "userId": new mongoose.Types.ObjectId(userId),
+        "categoryId": new mongoose.Types.ObjectId(categoryId),
+        "dateTransaction": { $gte: startDate, $lt: endDate},
         
-       }
+      }}, 
+      {
+        $group : { 
+        _id: "$description",
+        totalAmount: { $sum: "$amount"},
+        count: { $sum: 1 }, 
+        }
       }
-    ])
-    const profit = result.find(item => item._id === true).totalAmount
-    const costs = result.find(item => item._id === false).totalAmount
-    return profit - costs
+    ]).sort({ totalAmount: 'desc' })
+
+    return result
   }
+
+  rangeDate(strDate) {
+    const date = new Date(strDate)
+    const startDate = new Date(strDate)
+    const endDate = new Date(strDate)
+    startDate.setDate(1)
+    endDate.setMonth(date.getMonth() + 1)
+    return { startDate, endDate }
+  }
+
 }
 
 export default new StatisticService

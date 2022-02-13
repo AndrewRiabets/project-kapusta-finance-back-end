@@ -24,6 +24,14 @@ class StatisticController {
     const data = await statisticService.categoryGrouping(userId, date, true)
     res.json(data)
   }
+
+  async groupItems(req, res) {
+    const { date } = req.query
+    const { categoryId } = req.params
+    const userId = req.user.id
+    const data = await statisticService.itemsGrouping(userId, categoryId, date)
+    res.json(data)
+  }
 }
 
 export default new StatisticController

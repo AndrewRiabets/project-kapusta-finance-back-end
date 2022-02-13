@@ -311,18 +311,91 @@
     "/statistic/category-grouping/profit/:date": {
       "get": {
         "tags": ["Statistic"],
-        "summary": "Возвращает объект - сводку доходов за месяц сгруппированую по категориям"
+        "summary": "Возвращает объект - сводку доходов за месяц сгруппированую по категориям",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "date",
+            "required": "true",
+            "type": "string",
+            "description": "Строковое значение даты указывающее на отчетный месяц ('2021-09-01')"
+          }
+        ],
+        "security": [{"Bearer": []}],
+        "responses": {
+          "200": {
+            "description": "Ok operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryGroupResponse"
+                }
+              }
+            }
+          }
+        } 
       }
     },
     "/statistic/category-grouping/costs/:date": {
       "get": {
         "tags": ["Statistic"],
-        "summary": "Возвращает объект - сводку расходов за месяц сгруппированую по категориям"
+        "summary": "Возвращает объект - сводку расходов за месяц сгруппированую по категориям",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "date",
+            "required": "true",
+            "type": "string",
+            "description": "Строковое значение даты указывающее на отчетный месяц ('2021-09-01')"
+          }
+        ],
+        "security": [{"Bearer": []}],
+        "responses": {
+          "200": {
+            "description": "Ok operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryGroupResponse"
+                }
+              }
+            }
+          }
+        } 
       }
     },
     "/statistic/items-grouping/:categoryId": {
       "get": {
-        "tags": ["Statistic"] 
+        "tags": ["Statistic"],
+        "summary": "Возвращает масив - сводку типов трансакций по одной категории",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "categoryId",
+            "required": "true",
+            "type": "string",
+            "description": "ID категории по которой проводится групировка данных"
+          },
+          {
+            "in": "query",
+            "name": "date",
+            "type": "string",
+            "description": "Строковое значение даты указывающее на отчетный месяц ('2021-09-01')"
+          }
+        ],
+        "security": [{"Bearer": []}],
+        "responses": {
+          "200": {
+            "description": "Ok operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemsGroupResponse"
+                }
+              }
+            }
+          }
+        }
       }
     }
 
@@ -529,22 +602,70 @@
         "type": "Массив объектов",
         "example": [
           {
-            "id": 3,
-            "description": "ДЕКАБРЬ 2021",
+            "id": 6,
+            "startDate": "2021-09-01",
+            "endDate": "2021-09-30",
+            "description": "СЕНТЯБРЬ 2021",
             "profit": {
-              "_id": true,
-              "totalAmount": 333,
-              "count": 1
+                "_id": true,
+                "totalAmount": 55234.56,
+                "count": 4
             },
             "costs": {
-              "_id": false,
-              "totalAmount": 1873,
-              "count": 3
+                "_id": false,
+                "totalAmount": 12357,
+                "count": 56
             }
-          }
+        }
+        ]
+      },
+      "CategoryGroupResponse": {
+        "type": "Массив объектов",
+        "example": [
+          {
+            "_id": {
+                "categoryId": "6203a88a22bff1ae23f5c6ad",
+                "categoryName": "Зарплата",
+                "startDate": "2021-11-01T00:00:00.000Z"
+            },
+            "totalAmount": 36000,
+            "count": 2
+        }
+        ]
+      },
+      "ItemsGroupResponse": {
+        "type": "Массив объектов",
+        "example": [
+            {
+                "_id": "Свинина",
+                "totalAmount": 3790,
+                "count": 5
+            },
+            {
+                "_id": "Говядина",
+                "totalAmount": 2480,
+                "count": 4
+            },
+            {
+                "_id": "Курица",
+                "totalAmount": 2410,
+                "count": 10
+            },
+            {
+                "_id": "Овощи",
+                "totalAmount": 1060,
+                "count": 4
+            },
+            {
+                "_id": "Рыба",
+                "totalAmount": 960,
+                "count": 4
+            }
         ]
       }
+      
     },
+
 
     "securitySchemes": {
       "Bearer": {
