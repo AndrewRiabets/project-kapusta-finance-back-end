@@ -34,11 +34,6 @@ class UserController {
       return res.status(200).json(userData)
   }
 
-  async getUsers(req, res) {
-      const users = await userService.getAllUsers()
-      res.status(200).json(users)
-  }
-
   async resetBalance(req, res) {
     const { balance } = req.body
     const userId = req.user.id
