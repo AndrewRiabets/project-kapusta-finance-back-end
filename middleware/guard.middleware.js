@@ -18,7 +18,6 @@ export default async function(req, res, next) {
       return next(ApiError.UnauthorizedError())
     }
     req.user = userData
-    req.user.accessToken = accessToken
     next()
   } catch (e) {
     return next(ApiError.UnauthorizedError())
