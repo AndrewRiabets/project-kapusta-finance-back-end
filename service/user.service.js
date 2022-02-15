@@ -15,7 +15,7 @@ class UserService {
     const payload = {id: user._id, email: user.email}
     const tokens = tokenService.generateTokens(payload)
     await tokenService.saveToken(user._id, tokens.refreshToken)
-    return {accessToken: tokens.accessToken, user: payload}
+    return {...tokens, user: payload}
   }
 
   async login(email, password) {
@@ -30,11 +30,11 @@ class UserService {
     const payload = {id: user._id, email: user.email}
     const tokens = tokenService.generateTokens(payload)
     await tokenService.saveToken(user._id, tokens.refreshToken)
-    return {accessToken: tokens.accessToken, user: payload}
+    return {...tokens, user: payload}
   }
 
-  async logout(refreshToken, accessToken) {
-    const token = await tokenService.removeToken(refreshToken, accessToken)
+  async logout(refreshToken) {
+    const token = await tokenService.removeToken(refreshToken)
     return token
   }
 
@@ -51,7 +51,7 @@ class UserService {
     const payload = {id: user._id, email: user.email}
     const tokens = tokenService.generateTokens(payload)
     await tokenService.saveToken(user._id, tokens.refreshToken)
-    return {accessToken: tokens.accessToken, user: payload}
+    return {...tokens, user: payload}
   }
 
   async googleLoginTokens(email) {
@@ -81,7 +81,7 @@ class UserService {
     const payload = {id: user._id, email: user.email}
     const tokens = tokenService.generateTokens(payload)
     await tokenService.saveToken(user._id, tokens.refreshToken)
-    return {accessToken: tokens.accessToken, user: payload}
+    return {...tokens, user: payload}
   }
 
 }
