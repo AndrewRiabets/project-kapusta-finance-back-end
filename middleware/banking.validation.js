@@ -2,6 +2,9 @@ import Joi from 'joi'
 import ApiError from '../exceptions/api.error'
 
 export const insertValidation = async (req, res, next) => {
+  const date =  new Date(req.body.dateTransaction)
+  date.setHours(12)
+  req.body.dateTransaction = date
   const schema = Joi.object({
     categoryId: Joi.string().length(24).pattern(/^[0-9a-f]*$/).required(),
     dateTransaction: Joi.date(),

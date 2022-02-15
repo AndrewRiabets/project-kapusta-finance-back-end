@@ -24,7 +24,8 @@ class UserController {
 
   async logout(req, res) {
       const { refreshToken } = req.cookies
-      const token = await userService.logout(refreshToken)
+      const { accessToken } = req.user
+      const token = await userService.logout(refreshToken, accessToken )
       res.clearCookie('refreshToken')
       return res.status(200).json(token)
   }
@@ -50,56 +51,55 @@ class UserController {
 
   async googleAuth(req, res) {
         const strParams = queryString.stringify({
-        client_id: process.env.GOOGLE_CLIENT_ID,
-        redirect_uri: `${process.env.BASE_URL}/api/auth/google-redirect`,
-        scope: [
-          "https://www.googleapis.com/auth/userinfo.email",
-          "https://www.googleapis.com/auth/userinfo.profile",
-        ].join(" "),
+      client_id: process.env.GOOGLE_CLIENT_ID,
+      redirect_uri: `${process.env.BASE_URL}/api/auth/google-redirect`,
+      scope: [
+         "https://www.googleapis.com/auth/userinfo.email",
+         "https://www.googleapis.com/auth/userinfo.profile",
+      ].join(" "),
 
-        response_type: 'code',
-        access_type: 'offline',
-        prompt: 'consent',
-      })
-      
-      return res.redirect(
-        `https://accounts.google.com/o/oauth2/v2/auth?${strParams}`
-      )
+      response_type: 'code',
+      access_type: 'offline',
+      prompt: 'consent',
+     })
+     return res.redirect(
+      `https://accounts.google.com/o/oauth2/v2/auth?${strParams}`
+    )
   }
 
   async googleRedirect(req, res) {
-      const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`
-      const urlObj = new URL(fullUrl)
-      
-      const urlParams = queryString.parse(urlObj.search)
-      const code = urlParams.code
+    const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`
+    const urlObj = new URL(fullUrl)
+    const urlParams = queryString.parse(urlObj.search)
+    const code = urlParams.code
             
-      const tokenData = await axios({
-        url: 'https://oauth2.googleapis.com/token',
-        method: 'post',
-        data: {
-          client_id: process.env.GOOGLE_CLIENT_ID,
-          client_secret: process.env.GOOGLE_CLIENT_SECRET,
-          redirect_uri: `${process.env.BASE_URL}/api/auth/google-redirect`,
-          grant_type: 'authorization_code',
-          code,
-        },
-      })
+    const tokenData = await axios({
+      url: 'https://oauth2.googleapis.com/token',
+      method: 'post',
+      data: {
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        redirect_uri: `${process.env.BASE_URL}/api/auth/google-redirect`,
+        grant_type: 'authorization_code',
+        code,
+      },
+    })
       
-      const userData = await axios({
-        url: 'https://www.googleapis.com/oauth2/v2/userinfo',
-        method: 'get',
-        headers: {
-          Authorization: `Bearer ${tokenData.data.access_token}`
-        }
-      })
+    const userData = await axios({
+      url: 'https://www.googleapis.com/oauth2/v2/userinfo',
+      method: 'get',
+      headers: {
+         Authorization: `Bearer ${tokenData.data.access_token}`
+      }
+    })
 
-       console.log(userData.data.email);
+    const tokens = await userService.googleLoginTokens(userData.data.email)
+    res.cookie('refreshToken', tokens.refreshToken, {maxAge: 2592000000, httpOnly: true})
 
-      // return res.redirect(
-      //   `${process.env.FRONTEND_URL}?email=${userData.data.email}`
-      // )
-      return res.status(200).json({st: 'ok'})
+    return res.redirect(
+      `${process.env.CLIENT_URL}/google-redirect`
+    )
+      
   }
 }
 
