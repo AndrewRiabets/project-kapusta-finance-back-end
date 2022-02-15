@@ -1,5 +1,12 @@
 import jwt from 'jsonwebtoken'
+import { createBlackList } from 'jwt-blacklist'
+
 import TokenModel from '../models/token.model'
+
+const blacklist = await createBlackList({
+  daySize: 10000,
+  errorRate: 0.001,
+})
 
 class TokenService {
   generateTokens(payload) {
@@ -21,8 +28,10 @@ class TokenService {
     return token
   }
 
-  async removeToken(refreshToken) {
+  async removeToken(refreshToken, accessToken) {
     const tokenData = await TokenModel.deleteOne({refreshToken})
+    const blackToken = await blacklist.add(accessToken)
+        
     return tokenData
   }
 
@@ -31,7 +40,10 @@ class TokenService {
     return tokenData
   }
 
-  verifyAccessToken(token) {
+  async verifyAccessToken(token) {
+    if (await blacklist.has(token)) {
+      return null
+    }
     try {
       const userData = jwt.verify(token, process.env.JWT_ACCESS_SECRET)
       return userData
