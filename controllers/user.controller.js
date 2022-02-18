@@ -11,14 +11,14 @@ class UserController {
   async registration(req, res) {
       const {email, password} = req.body
       const userData = await userService.registration(email, password)
-      res.cookie('refreshToken', userData.refreshToken, {maxAge: 2592000000, httpOnly: true})
+      res.cookie('refreshToken', userData.refreshToken, {maxAge: 2592000000, httpOnly: true, sameSite: 'none', secure: true})
       return res.status(201).json(userData)
   }
 
   async login(req, res) {
       const {email, password} = req.body
       const userData = await userService.login(email, password)
-      res.cookie('refreshToken', userData.refreshToken, {maxAge: 2592000000, httpOnly: true})
+      res.cookie('refreshToken', userData.refreshToken, {maxAge: 2592000000, httpOnly: true, sameSite: 'none', secure: true})
       return res.status(200).json(userData)
   }
 
@@ -32,7 +32,7 @@ class UserController {
   async refresh(req, res) {
       const { refreshToken } = req.cookies
       const userData = await userService.refresh(refreshToken)
-      res.cookie('refreshToken', userData.refreshToken, {maxAge: 2592000000, httpOnly: true})
+      res.cookie('refreshToken', userData.refreshToken, {maxAge: 2592000000, httpOnly: true, sameSite: 'none', secure: true})
       return res.status(200).json(userData)
   }
 
@@ -92,11 +92,15 @@ class UserController {
       }
     })
 
-    const tokens = await userService.googleLoginTokens(userData.data.email)
-    res.cookie('refreshToken', tokens.refreshToken, {maxAge: 2592000000, httpOnly: true})
+    const result = await userService.googleLoginTokens(userData.data.email)
+    const { tokens, payload } = result
+    res.cookie('refreshToken', tokens.refreshToken, {maxAge: 2592000000, httpOnly: true, sameSite: 'none', secure: true})
+
+    
+    const strParams = queryString.stringify({accessToken: tokens.accessToken, ...payload })
 
     return res.redirect(
-      `${process.env.CLIENT_URL}/google-redirect`
+      `${process.env.CLIENT_URL}/google-redirect?${strParams}`
     )
       
   }
