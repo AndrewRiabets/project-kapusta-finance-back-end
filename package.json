@@ -11,6 +11,7 @@
   "author": "viacheslav-ua",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.25.0",
     "bcrypt": "^5.0.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -20,10 +21,10 @@
     "joi": "^17.6.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.2.0",
-    "swagger-ui-express": "^4.3.0",
-    "uuid": "^8.3.2"
+    "query-string": "^7.1.0",
+    "swagger-ui-express": "^4.3.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"
   }
-} 
+}

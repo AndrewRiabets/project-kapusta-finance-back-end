@@ -1,17 +1,25 @@
 import express from 'express'
+import tryCatchWrapper from '../helpers/try.wrapper'
 import userController from '../controllers/user.controller'
-import {authValidation} from '../middleware/auth.validation'
+import {authValidation} from '../middleware/user.validation'
+import guard from '../middleware/guard.middleware'
 
 const router = express.Router()
 
-router.post('/registration', authValidation, userController.registration)
+router.post('/registration', authValidation, tryCatchWrapper(userController.registration))
 
-router.post('/login', userController.login)
+router.post('/login', tryCatchWrapper(userController.login))
 
-router.post('/logout', userController.logout)
+router.post('/logout', guard, tryCatchWrapper(userController.logout))
 
-router.get('/refresh', userController.refresh)
+router.get('/refresh', tryCatchWrapper(userController.refresh))
 
-router.get('/users', userController.getUsers)
+router.get('/users', guard, tryCatchWrapper(userController.getUsers))
+
+router.get('/google', tryCatchWrapper(userController.googleAuth))
+
+router.get('/google-redirect', tryCatchWrapper(userController.googleRedirect))
+
+
 
 export default router
